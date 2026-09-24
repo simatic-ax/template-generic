@@ -1,4 +1,5 @@
 # This workflow is triggered when a release is published via the UI
+# The workflow is only executed if the release is a tag and the target_commitish is a release branch
 name: Release workflow
 
 # Start the workflow as soon as a release has been published via the UI
@@ -12,18 +13,8 @@ permissions:
   actions: write     # required for artifact uploading
 
 jobs:
-  call-development:
-    name: Build the package
-    uses: ./.github/workflows/package-development-workflow.yml
-    secrets:
-      APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
-    with:
-      ref: ${{ github.event.release.target_commitish }}
-      version: ${{ github.event.release.tag_name }}
-
   release:
     name: Release the package
-    needs: call-development
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/simatic-ax/ci-images/apax-ci-image:4.3.0
@@ -36,27 +27,16 @@ jobs:
         with:
           # checks out the branch that has been selected during the release process
           ref: ${{ github.event.release.target_commitish }}
-          fetch-depth: 0
-
-      - name: Create bin folder
-        run: mkdir -p bin
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: bin
 
       - name: Version package
         uses: simatic-ax/actions/apax-version@v4
         with:
           version: ${{ github.event.release.tag_name }}
 
-      - name: Package source code
+      - name: Package template
         uses: simatic-ax/actions/apax-pack@v4
         with:
-          key-version: "v2"
-          key: ${{ secrets.APAX_SIGNKEY_V2 }}
+          key: ${{ secrets.APAX_SIGNKEY }}
 
       - name: Login to required registries
         uses: simatic-ax/actions/apax-login@v4
@@ -70,3 +50,4 @@ jobs:
         with:
           registries: |
             https://npm.pkg.github.com
+          tag: latest
