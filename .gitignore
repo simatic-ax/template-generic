@@ -1,0 +1,13 @@
+.apax
+.env
+bin
+obj
+TestResult
+*.tgz
+assets
+/.vs
+.secrets
+.github/skills/
+.github/agents/
+.github/prompts/
+

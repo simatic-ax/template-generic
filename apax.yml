@@ -1,0 +1,9 @@
+name: '@simatic-ax/template-generic'
+version: 0.0.0-placeholder
+description: "A template for generic projects for the SIMATIC AX GitHub Community"
+type: generic
+author: Siemens AG
+registries:
+  '@simatic-ax': 'https://npm.pkg.github.com/'
+files:
+  - 'template'
